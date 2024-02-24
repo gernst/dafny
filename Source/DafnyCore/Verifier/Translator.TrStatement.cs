@@ -1404,6 +1404,9 @@ namespace Microsoft.Dafny {
         invariants.Add(new Bpl.AssumeCmd(freeInvariant.tok, freeInvariant));
       }
       BoogieStmtListBuilder invDefinednessBuilder = new BoogieStmtListBuilder(this, options);
+      if (options.SecurityVerify) {
+        invDefinednessBuilder.AddLabelCmd("well_formedness" + CurrentIdGenerator.FreshNumericId());
+      }
       foreach (AttributedExpression loopInv in s.Invariants) {
         var (errorMessage, successMessage) = CustomErrorMessage(loopInv.Attributes);
         TrStmt_CheckWellformed(loopInv.E, invDefinednessBuilder, locals, etran, false);
@@ -1484,6 +1487,9 @@ namespace Microsoft.Dafny {
 
       // As the first thing inside the loop, generate:  if (!w) { CheckWellformed(inv); assume false; }
       invDefinednessBuilder.Add(TrAssumeCmd(s.Tok, Bpl.Expr.False));
+      if (options.SecurityVerify) {
+        loopBodyBuilder.Add(TrAssumeCmd(s.Tok, new Bpl.LowExpr(s.Tok, w)));
+      }
       loopBodyBuilder.Add(new Bpl.IfCmd(s.Tok, Bpl.Expr.Not(w), invDefinednessBuilder.Collect(s.Tok), null, null));
 
       // Generate:  CheckWellformed(guard); if (!guard) { break; }

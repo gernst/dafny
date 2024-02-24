@@ -719,6 +719,14 @@ namespace Microsoft.Dafny {
               var e = oldExpr;
               return OldAt(e.AtLabel).TrExpr(e.E);
             }
+          case LowExpr lowExpr: {
+              var e = lowExpr;
+              return  ExprHelper.Low(TrExpr(e.E));
+            }
+          case LowEventExpr lowEventExpr: {
+              var e = lowEventExpr;
+              return new Boogie.LowEventExpr(Token.NoToken);
+            }
           case UnchangedExpr unchangedExpr: {
               var e = unchangedExpr;
               return translator.FrameCondition(GetToken(e), e.Frame, false, FrameExpressionUse.Unchanged, OldAt(e.AtLabel), this, this, true);

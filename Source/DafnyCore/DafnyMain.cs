@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Security;
 using DafnyCore;
 using Microsoft.Boogie;
 using Microsoft.Extensions.Logging;
@@ -165,7 +166,10 @@ to also include a directory containing the `z3` executable.
       string programId) {
       Contract.Requires(program != null);
       Contract.Requires(bplFileName != null);
-
+      if (options.SecurityVerify) {
+        Security.CalculateMpp(program, new List<string> { "well-formedness", "well_formedness"});
+        engine.PrintBplFile(bplFileName, program, false, false, options.PrettyPrint);
+      }
       var stats = new PipelineStatistics();
       var outcome = engine.ResolveAndTypecheck(program, bplFileName, out _);
       switch (outcome) {

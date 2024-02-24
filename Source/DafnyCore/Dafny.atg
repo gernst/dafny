@@ -4345,6 +4345,9 @@ ConstAtomExpression<out Expression e>
   | "|"                                        (. x = t; .)
       Expression<out e, true, true, false>     (. e = new UnaryOpExpr(x, UnaryOpExpr.Opcode.Cardinality, e); .)
     "|"
+  | "low"                                      (. x = t; .)
+    "(" Expression<out e, true, true> ")"      (. e = new LowExpr(x, e); .)
+  | "lowEvent"                                 (. x = t; e = new LowEventExpr(x); .)
   | ParensExpression<out e>
   ) (. if(x!= null) { e.RangeToken = new RangeToken(x, t); } .)
   .

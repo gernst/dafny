@@ -5387,6 +5387,9 @@ namespace Microsoft.Dafny.Compilers {
         var e = (ConcreteSyntaxExpression)expr;
         EmitExpr(e.ResolvedExpression, inLetExprBody, wr, wStmts);
 
+      } else if (expr is LowExpr || expr is LowEventExpr) {
+        EmitExpr(new LiteralExpr(expr.tok, true), inLetExprBody, wr, wStmts);
+
       } else {
         Contract.Assert(false); throw new cce.UnreachableException();  // unexpected expression
       }

@@ -2525,6 +2525,9 @@ namespace Microsoft.Dafny {
           RequiresName(f), new List<Bpl.TypeVariable>(),
           funcFormals.ConvertAll(v => (Bpl.Variable)BplFormalVar(null, v.TypedIdent.Type, true)),
           BplFormalVar(null, Bpl.Type.Bool, false));
+        if (options.SecurityVerify && f is Predicate) {
+          precondF.AddAttribute("relational");
+        }
         sink.AddTopLevelDeclaration(precondF);
 
         var appl = FunctionCall(f.tok, RequiresName(f), Bpl.Type.Bool, reqFuncArguments);
@@ -4846,7 +4849,7 @@ namespace Microsoft.Dafny {
       Contract.Requires(predef != null);
       Contract.Ensures(Contract.Result<Bpl.Expr>() != null);
 
-      if (expr is LiteralExpr || expr is ThisExpr || expr is IdentifierExpr || expr is WildcardExpr || expr is BoogieWrapper) {
+      if (expr is LiteralExpr || expr is ThisExpr || expr is IdentifierExpr || expr is WildcardExpr || expr is BoogieWrapper || expr is LowEventExpr) {
         return Bpl.Expr.True;
       } else if (expr is DisplayExpression) {
         DisplayExpression e = (DisplayExpression)expr;
@@ -4923,6 +4926,9 @@ namespace Microsoft.Dafny {
       } else if (expr is OldExpr) {
         var e = (OldExpr)expr;
         return CanCallAssumption(e.E, etran.OldAt(e.AtLabel));
+      } else if (expr is LowExpr) {
+        var e = (LowExpr)expr;
+        return CanCallAssumption(e.E, etran);
       } else if (expr is UnchangedExpr) {
         var e = (UnchangedExpr)expr;
         Bpl.Expr be = Bpl.Expr.True;
@@ -6775,6 +6781,9 @@ namespace Microsoft.Dafny {
         }
         var res = new Bpl.Formal(f.tok, new Bpl.TypedIdent(f.tok, Bpl.TypedIdent.NoName, TrType(f.ResultType)), false);
         func = new Bpl.Function(f.tok, f.FullSanitizedName, new List<Bpl.TypeVariable>(), formals, res, "function declaration for " + f.FullName);
+        if (options.SecurityVerify && f is Predicate) {
+          func.AddAttribute("relational");
+        }
         if (InsertChecksums) {
           InsertChecksum(f, func);
         }
@@ -6799,6 +6808,9 @@ namespace Microsoft.Dafny {
         }
         var res = new Bpl.Formal(f.tok, new Bpl.TypedIdent(f.tok, Bpl.TypedIdent.NoName, Bpl.Type.Bool), false);
         var canCallF = new Bpl.Function(f.tok, f.FullSanitizedName + "#canCall", new List<Bpl.TypeVariable>(), formals, res);
+        if (options.SecurityVerify && f is Predicate) {
+          canCallF.AddAttribute("relational");
+        }
         sink.AddTopLevelDeclaration(canCallF);
       }
 
