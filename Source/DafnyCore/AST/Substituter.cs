@@ -212,6 +212,8 @@ namespace Microsoft.Dafny {
             Useless = e.Useless
           };
         }
+      } else if (expr is LowEventExpr) {
+        // do nothing!
       } else if (expr is UnchangedExpr) {
         var e = (UnchangedExpr)expr;
         var fr = new List<FrameExpression>();
@@ -246,6 +248,14 @@ namespace Microsoft.Dafny {
         var toType = e.ToType.Subst(typeMap);
         if (se != e.E || fromType != e.FromType || toType != e.ToType) {
           newExpr = new BoxingCastExpr(se, fromType, toType);
+        }
+      } else if (expr is LowExpr) {
+        var e = (LowExpr)expr;
+        var se = Substitute(e.E);
+        if (se != e.E) {
+          var newLow = new LowExpr(expr.tok, se);
+          newLow.Type = Type.Bool;
+          newExpr = newLow;
         }
       } else if (expr is UnaryExpr) {
         var e = (UnaryExpr)expr;

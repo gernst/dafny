@@ -2783,6 +2783,9 @@ namespace Microsoft.Dafny {
         }
         var res = new Bpl.Formal(f.tok, new Bpl.TypedIdent(f.tok, Bpl.TypedIdent.NoName, TrType(f.ResultType)), false);
         func = new Bpl.Function(f.tok, f.FullSanitizedName, new List<Bpl.TypeVariable>(), formals, res, "function declaration for " + f.FullName);
+        if (options.SecurityVerify && f is Predicate) {
+          func.AddAttribute("relational");
+        }
         if (InsertChecksums) {
           InsertChecksum(f, func);
         }
@@ -2807,6 +2810,9 @@ namespace Microsoft.Dafny {
         }
         var res = new Bpl.Formal(f.tok, new Bpl.TypedIdent(f.tok, Bpl.TypedIdent.NoName, Bpl.Type.Bool), false);
         var canCallF = new Bpl.Function(f.tok, f.FullSanitizedName + "#canCall", new List<Bpl.TypeVariable>(), formals, res);
+        if (options.SecurityVerify && f is Predicate) {
+          canCallF.AddAttribute("relational");
+        }
         sink.AddTopLevelDeclaration(canCallF);
       }
 

@@ -748,6 +748,14 @@ namespace Microsoft.Dafny {
               var e = oldExpr;
               return OldAt(e.AtLabel).TrExpr(e.E);
             }
+          case LowExpr lowExpr: {
+              var e = lowExpr;
+              return new Boogie.LowExpr(GetToken(e), TrExpr(e.E));
+            }
+          case LowEventExpr lowEventExpr: {
+              var e = lowEventExpr;
+              return new Boogie.LowEventExpr(GetToken(e));
+            }
           case UnchangedExpr unchangedExpr: {
               var e = unchangedExpr;
               return BoogieGenerator.FrameCondition(GetToken(e), e.Frame, false, FrameExpressionUse.Unchanged, OldAt(e.AtLabel), this, this, true);
@@ -2059,7 +2067,7 @@ BplBoundVar(varNameGen.FreshId(string.Format("#{0}#", bv.Name)), predef.BoxType,
         Contract.Requires(BoogieGenerator.predef != null);
         Contract.Ensures(Contract.Result<Boogie.Expr>() != null);
 
-        if (expr is LiteralExpr || expr is ThisExpr || expr is IdentifierExpr || expr is WildcardExpr || expr is BoogieWrapper) {
+        if (expr is LiteralExpr || expr is ThisExpr || expr is IdentifierExpr || expr is WildcardExpr || expr is BoogieWrapper || expr is LowEventExpr) {
           return Boogie.Expr.True;
         } else if (expr is DisplayExpression) {
           DisplayExpression e = (DisplayExpression)expr;
@@ -2136,6 +2144,9 @@ BplBoundVar(varNameGen.FreshId(string.Format("#{0}#", bv.Name)), predef.BoxType,
         } else if (expr is OldExpr) {
           var e = (OldExpr)expr;
           return OldAt(e.AtLabel).CanCallAssumption(e.E);
+        } else if (expr is LowExpr) {
+          var e = (LowExpr)expr;
+          return CanCallAssumption(e.E);
         } else if (expr is UnchangedExpr) {
           var e = (UnchangedExpr)expr;
           Boogie.Expr be = Boogie.Expr.True;

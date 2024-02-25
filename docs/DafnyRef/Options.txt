@@ -567,6 +567,8 @@ Usage: dafny [ option ... ] [ filename ... ]
                 0 = do not coalesce blocks
                 1 = coalesce blocks (default)
   /traceverify  print debug output during verification condition generation
+  /securityverify
+                enable verification of secrurity specifications with low expressions
   /subsumption:<c>
                 apply subsumption to asserted conditions:
                 0 - never, 1 - not for quantifiers, 2 (default) - always

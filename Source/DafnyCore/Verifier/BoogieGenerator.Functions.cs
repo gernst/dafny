@@ -804,6 +804,9 @@ public partial class BoogieGenerator {
         RequiresName(f), new List<Bpl.TypeVariable>(),
         funcFormals.ConvertAll(v => (Bpl.Variable)BplFormalVar(null, v.TypedIdent.Type, true)),
         BplFormalVar(null, Bpl.Type.Bool, false));
+      if (options.SecurityVerify && f is Predicate) {
+        precondF.AddAttribute("relational");
+      }
       sink.AddTopLevelDeclaration(precondF);
 
       var appl = FunctionCall(f.tok, RequiresName(f), Bpl.Type.Bool, reqFuncArguments);

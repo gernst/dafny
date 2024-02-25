@@ -857,6 +857,15 @@ namespace Microsoft.Dafny {
             CheckWellformed(e.E, wfOptions.WithReadsChecks(false), locals, builder, etran.OldAt(e.AtLabel));
             break;
           }
+        case LowExpr lowExpr: {
+            var e = lowExpr;
+            CheckWellformed(e.E, wfOptions, locals, builder, etran);
+            break;
+          }
+        case LowEventExpr lowEventExpr: {
+            var e = lowEventExpr;
+            break;
+          } 
         case UnchangedExpr unchangedExpr: {
             var e = unchangedExpr;
             foreach (var fe in e.Frame) {
@@ -906,12 +915,18 @@ namespace Microsoft.Dafny {
               case BinaryExpr.ResolvedOpcode.And:
               case BinaryExpr.ResolvedOpcode.Imp: {
                   BoogieStmtListBuilder b = new BoogieStmtListBuilder(this, options);
+                  if (options.SecurityVerify) {
+                    b.AddLabelCmd("well_formedness" + CurrentIdGenerator.FreshNumericId());
+                  }
                   CheckWellformed(e.E1, wfOptions, locals, b, etran);
                   builder.Add(new Bpl.IfCmd(binaryExpr.tok, etran.TrExpr(e.E0), b.Collect(binaryExpr.tok), null, null));
                 }
                 break;
               case BinaryExpr.ResolvedOpcode.Or: {
                   BoogieStmtListBuilder b = new BoogieStmtListBuilder(this, options);
+                  if (options.SecurityVerify) {
+                    b.AddLabelCmd("well_formedness" + CurrentIdGenerator.FreshNumericId());
+                  }
                   CheckWellformed(e.E1, wfOptions, locals, b, etran);
                   builder.Add(new Bpl.IfCmd(binaryExpr.tok, Bpl.Expr.Not(etran.TrExpr(e.E0)), b.Collect(binaryExpr.tok), null, null));
                 }
@@ -1164,6 +1179,9 @@ namespace Microsoft.Dafny {
             ITEExpr e = iteExpr;
             CheckWellformed(e.Test, wfOptions, locals, builder, etran);
             var bThen = new BoogieStmtListBuilder(this, options);
+            if (options.SecurityVerify) {
+              bThen.AddLabelCmd("well_formedness" + CurrentIdGenerator.FreshNumericId());
+            }
             var bElse = new BoogieStmtListBuilder(this, options);
             if (e.IsBindingGuard) {
               // if it is BindingGuard, e.Thn is a let-such-that created from the BindingGuard.

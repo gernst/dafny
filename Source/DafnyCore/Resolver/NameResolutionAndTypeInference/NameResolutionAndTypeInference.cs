@@ -719,6 +719,15 @@ namespace Microsoft.Dafny {
         e.AtLabel = ResolveDominatingLabelInExpr(expr.tok, e.At, "old", resolutionContext);
         ResolveExpression(e.E, new ResolutionContext(resolutionContext.CodeContext, false) with { InOld = true });
         expr.Type = e.E.Type;
+        
+      } else if (expr is LowExpr) {
+        var e = (LowExpr)expr;
+        ResolveExpression(e.E, resolutionContext);
+        expr.Type = Type.Bool;
+        
+      } else if (expr is LowEventExpr) {
+        var e = (LowEventExpr)expr;
+        expr.Type = Type.Bool;
 
       } else if (expr is UnchangedExpr) {
         var e = (UnchangedExpr)expr;

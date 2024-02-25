@@ -156,7 +156,10 @@ namespace Microsoft.Dafny {
       string programId) {
       Contract.Requires(program != null);
       Contract.Requires(bplFileName != null);
-
+      if (options.SecurityVerify) {
+        Boogie.Security.CalculateMpp(program, new List<string> { "well-formedness", "well_formedness"});
+        engine.PrintBplFile(bplFileName, program, false, false, options.PrettyPrint);
+      }
       var stats = new PipelineStatistics();
       var outcome = engine.ResolveAndTypecheck(program, bplFileName, out _);
       switch (outcome) {

@@ -752,7 +752,17 @@ namespace Microsoft.Dafny {
         wr.Write("fresh{0}(", label == null ? "" : "@" + label);
         PrintExpression(e.E, false);
         wr.Write(")");
+      
+      } else if (expr is LowExpr) {
+        var e = (LowExpr)expr;
+        wr.Write("low(");
+        PrintExpression(e.E, false);
+        wr.Write(")");
 
+      } else if (expr is LowEventExpr) {
+        var e = (LowEventExpr)expr;
+        wr.Write("lowEvent()");
+        
       } else if (expr is UnaryOpExpr) {
         var e = (UnaryOpExpr)expr;
         if (e.Op == UnaryOpExpr.Opcode.Cardinality) {
